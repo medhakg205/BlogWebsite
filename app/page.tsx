@@ -1,4 +1,6 @@
 'use client'
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -89,10 +91,21 @@ const closeBlogModal = () => setSelectedBlog(null);
     else getSession()
   }
 
-  const signUp = async () => {
-    const { error } = await supabase.auth.signUp({ email, password })
-    if (error) alert(error.message)
+const signUp = async () => {
+  console.log("⚡ SignUp started");  // TEST
+  const { error } = await supabase.auth.signUp({ email, password });
+  console.log("⚡ Supabase returned"); // TEST
+
+  if (error) {
+    console.log("❌ Error:", error.message);
+    alert(error.message);
+    return;
   }
+
+  console.log("🎉 No error — showing alert now");
+  alert("🎉 Account created! Please check your email to confirm your account.");
+};
+
 
   const signOut = async () => {
     await supabase.auth.signOut()
