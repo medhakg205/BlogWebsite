@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function Home() {
-  // ❌ WRONG: Mixed order causing error
-  // ✅ ALL useState FIRST, useEffect LAST
   const [session, setSession] = useState<any>(null)
   const [blogs, setBlogs] = useState<any[]>([])
   const [email, setEmail] = useState('')
@@ -18,13 +16,10 @@ export default function Home() {
   const [content, setContent] = useState('')
   const [image, setImage] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
-  const [editingBlog, setEditingBlog] = useState<any>(null)  // ✅ NEW - ALL TOGETHER
-// Add these NEW states (after line 15)
+  const [editingBlog, setEditingBlog] = useState<any>(null)  
 const [contentFilters, setContentFilters] = useState<string[]>([]);
-
 const [availableContentTypes, setAvailableContentTypes] = useState<string[]>([]);
 const [availableTopics, setAvailableTopics] = useState<string[]>([]);
-
 const [selectedContentType, setSelectedContentType] = useState('');
 const [selectedTopicTag, setSelectedTopicTag] = useState('');
 const [topicFilters, setTopicFilters] = useState<string[]>([]);
@@ -32,13 +27,12 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
 const [selectedBlog, setSelectedBlog] = useState<any>(null);
 
 
-  // Theme colors (AFTER all hooks)
+ 
   const theme = isDark 
     ? 'bg-gray-900 text-white border-gray-700' 
     : 'bg-red-50/80 text-gray-900 border-red-200'
 
-  // ✅ useEffect LAST - always same position
-  // ✅ 1. INITIAL LOAD (runs once)
+
 useEffect(() => {
   if (typeof window !== 'undefined') {
     setIsDark(localStorage.getItem('darkMode') === 'true')
@@ -48,13 +42,12 @@ useEffect(() => {
   fetchBlogs()
 }, [])
 
-// ✅ 2. FILTER TRIGGER (runs when filters change) 
+
 useEffect(() => {
   fetchBlogs()
   fetchAvailableTags()
-}, [contentFilters, topicFilters]); // 👈 THIS IS THE ONE YOU ASKED ABOUT
+}, [contentFilters, topicFilters]); 
 
-// ✅ 3. SIDEBAR ESC (moved from line 25)
 useEffect(() => {
   const handleEscape = (e: KeyboardEvent) => {
     if (e.key === 'Escape') setSidebarOpen(false);
@@ -118,7 +111,7 @@ const signUp = async () => {
     .select('*')
     .order('created_at', { ascending: false });
 
-  // ✅ FIXED: Remove 'All' check - use empty array logic
+  
   if (contentFilters.length > 0) {
     query = query.eq('content_type', contentFilters[0]);
   }
@@ -135,7 +128,6 @@ const signUp = async () => {
 };
 
 const fetchAvailableTags = async () => {
-  // 👇 GET ALL TOPICS FROM blog_tags table (NOT blogs)
   const { data: topicData } = await supabase
     .from('blog_tags')
     .select('tag_name')
@@ -149,8 +141,7 @@ const fetchAvailableTags = async () => {
   const topics = topicData?.map((t: any) => t.tag_name) || []
   const contentTypes = contentData?.map((t: any) => t.tag_name) || []
   
-  console.log('ALL TOPICS FROM blog_tags:', topics) // 👈 This will show ALL!
-  
+  console.log('ALL TOPICS FROM blog_tags:', topics) 
   setAvailableContentTypes(contentTypes)
   setAvailableTopics(topics)
 }
@@ -180,8 +171,7 @@ const fetchAvailableTags = async () => {
         title,
         content,
         image_url: imageUrl,
-        // In createBlog/updateBlog, add to insert/update:
-content_type: selectedContentType,  // Add these states
+content_type: selectedContentType,  
 topic_tag: selectedTopicTag,
 
         user_id: session?.user?.id
@@ -225,7 +215,7 @@ const updateBlog = async () => {
       title,
       content,
       image_url: imageUrl,
-      content_type: selectedContentType,  // Add these states
+      content_type: selectedContentType,  
 topic_tag: selectedTopicTag,
     })
     .eq('id', editingBlog.id)
@@ -270,8 +260,6 @@ if (loading) return <div className="p-8 flex items-center justify-center min-h-s
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-red-400 via-red-300 to-white'} p-8 transition-all duration-300`}>
       <div className="max-w-4xl mx-auto">
-        
-        {/* Header with Dark Mode Toggle */}
         <div className={`flex justify-between items-center mb-8 ${theme} backdrop-blur-md rounded-xl p-6 border shadow-xl`}>
           <h1 className={`text-4xl font-black ${isDark ? 'text-red-400' : 'text-red-600'} drop-shadow-lg`}>
             Wordlane
@@ -428,12 +416,6 @@ if (loading) return <div className="p-8 flex items-center justify-center min-h-s
   )}
 </div>
 
-      {/* Content Filters */}
-      
-
-      {/* Topic Filters */}
-      
-
       
     </div>
   </>
@@ -514,12 +496,7 @@ if (loading) return <div className="p-8 flex items-center justify-center min-h-s
                 </button>
               </div>
             )}
-{/* 👉 NEW: TOPIC FILTER BAR - PASTE RIGHT HERE */}
 
-
-
-            {/* Blogs Grid */}
-            {/* Blogs Grid */}
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
   {blogs.map((blog) => (
     <div 
